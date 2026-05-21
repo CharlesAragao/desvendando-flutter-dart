@@ -964,7 +964,7 @@ pre {
   <div class="cover-glow"></div>
   <div class="cover-glow2"></div>
   <div class="cover-content">
-    <div class="cover-eyebrow">⚡ E-BOOK INTERATIVO · FACULDADE CDL · 2025</div>
+    <div class="cover-eyebrow">⚡ E-BOOK INTERATIVO · FACULDADE CDL · 2026</div>
     <h1>Desvendando<br><span class="grad">Flutter & Dart</span></h1>
     <p class="cover-desc">Do zero ao primeiro app. Aprenda com exercícios práticos interativos e ganhe XP enquanto domina os fundamentos.</p>
     <div class="cover-tags">
@@ -1473,7 +1473,90 @@ print(apelido!.<span class="fn">length</span>);    <span class="cmt">// Força a
     <div class="ch-num-badge">CAP. 04</div>
     <h2>Criando a<br><span>Primeira Interface</span></h2>
   </div>
-  <p class="ch-intro">Hora de colocar a mão na massa! Vamos ver como estilizar widgets com TextStyle e BoxDecoration, e como adicionar interatividade com setState.</p>
+  <p class="ch-intro">Antes de estilizar widgets e criar interatividade, você precisa saber <strong>onde escrever seu código Flutter</strong>. Vamos configurar o ambiente — ou usar uma alternativa online sem instalar nada.</p>
+
+  <h3>Opção 1: DartPad — Zero instalação</h3>
+  <p>O <strong>DartPad</strong> é um editor online oficial do Google que roda Dart e Flutter direto no navegador. É a forma mais rápida de começar sem instalar nada.</p>
+
+  <div class="info-box tip fade-in">
+    <span class="icon">🌐</span>
+    <div class="text">Acesse <strong><a href="https://dartpad.dev" target="_blank" style="color:var(--cyan)">dartpad.dev</a></strong> — selecione "Flutter" no canto superior direito, escreva seu código e clique em <strong>Run</strong>. Simples assim! Todos os exercícios práticos deste e-book usam o DartPad.</div>
+  </div>
+
+  <h3>Opção 2: Ambiente Local Completo</h3>
+  <p>Para desenvolver apps reais e publicar nas stores, você vai precisar do Flutter instalado na sua máquina. O processo tem 4 etapas:</p>
+
+  <div class="fade-in" style="display:flex;flex-direction:column;gap:10px;margin:20px 0">
+
+    <div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;align-items:flex-start">
+      <div style="background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-head);flex-shrink:0;color:#fff">1</div>
+      <div>
+        <div style="font-weight:600;color:var(--white);margin-bottom:4px">Instale o Flutter SDK</div>
+        <div style="color:var(--gray);font-size:14px">Acesse <a href="https://flutter.dev/docs/get-started/install" target="_blank" style="color:var(--blue)">flutter.dev/docs/get-started/install</a> e escolha seu sistema operacional (Windows, macOS ou Linux). O guia oficial mostra exatamente onde extrair os arquivos e configurar o PATH.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;align-items:flex-start">
+      <div style="background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-head);flex-shrink:0;color:#fff">2</div>
+      <div>
+        <div style="font-weight:600;color:var(--white);margin-bottom:4px">Instale o VS Code + extensões</div>
+        <div style="color:var(--gray);font-size:14px">Baixe o <a href="https://code.visualstudio.com" target="_blank" style="color:var(--blue)">VS Code</a> e instale as extensões <strong style="color:var(--white)">Flutter</strong> e <strong style="color:var(--white)">Dart</strong> pela aba Extensions. Elas adicionam autocomplete, debugging e Hot Reload integrado.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;align-items:flex-start">
+      <div style="background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-head);flex-shrink:0;color:#fff">3</div>
+      <div>
+        <div style="font-weight:600;color:var(--white);margin-bottom:4px">Crie seu primeiro projeto</div>
+        <div style="color:var(--gray);font-size:14px;margin-bottom:10px">Abra o terminal no VS Code e execute:</div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <div class="code-lang">terminal</div>
+            <button class="code-copy" onclick="copyCode(this)">copiar</button>
+          </div>
+          <pre><span class="cmt"># Criar novo projeto</span>
+flutter create meu_app
+
+<span class="cmt"># Entrar na pasta do projeto</span>
+cd meu_app
+
+<span class="cmt"># Rodar o app (com emulador aberto ou celular conectado)</span>
+flutter run</pre>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;align-items:flex-start">
+      <div style="background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-head);flex-shrink:0;color:#fff">4</div>
+      <div>
+        <div style="font-weight:600;color:var(--white);margin-bottom:4px">Configure um emulador ou use seu celular</div>
+        <div style="color:var(--gray);font-size:14px">Use um <strong style="color:var(--white)">emulador Android</strong> (via Android Studio) ou conecte seu celular por USB com a <strong style="color:var(--white)">depuração USB ativada</strong> nas opções do desenvolvedor do aparelho.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="info-box warn fade-in">
+    <span class="icon">⚠️</span>
+    <div class="text"><strong>Para apps iOS</strong> (iPhone/iPad), você precisará de um Mac com Xcode instalado. No Windows e Linux só é possível compilar para Android e Web.</div>
+  </div>
+
+  <table class="data-table fade-in">
+    <thead><tr><th>Ferramenta</th><th>Para quê serve</th><th>Obrigatório?</th></tr></thead>
+    <tbody>
+      <tr><td><code>Flutter SDK</code></td><td>O framework em si — sem ele nada funciona</td><td>✅ Sim</td></tr>
+      <tr><td><code>VS Code</code></td><td>Editor de código recomendado</td><td>⚡ Recomendado</td></tr>
+      <tr><td><code>Android Studio</code></td><td>Emulador Android + SDK do Android</td><td>⚡ Para mobile</td></tr>
+      <tr><td><code>Xcode</code></td><td>Compilar para iOS/macOS</td><td>🍎 Só no Mac</td></tr>
+      <tr><td><code>DartPad</code></td><td>Testar código sem instalar nada</td><td>🌐 Online</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box info fade-in">
+    <span class="icon">💡</span>
+    <div class="text"><strong>Dica para iniciantes:</strong> comece pelo DartPad para aprender sem se preocupar com instalação. Quando se sentir confortável com os conceitos, instale o ambiente completo para criar apps reais.</div>
+  </div>
 
   <h3>Estilização com TextStyle</h3>
   <div class="code-block fade-in">
