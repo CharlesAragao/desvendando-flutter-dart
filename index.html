@@ -2170,21 +2170,32 @@ function setActive(el) {
 
 // ── Scroll spy ──────────────────────────────────────────────────
 const sections = ['cover','cap1','cap2','cap3','cap4','cap5','cap6'];
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const id = e.target.id;
-      document.querySelectorAll('.nav-chapter').forEach(a => {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-      });
+
+function updateActiveNav() {
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  const offset = 120; // px from top to trigger
+
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= offset) {
+      current = id;
     }
   });
-}, { threshold: 0.3 });
 
-sections.forEach(id => {
-  const el = document.getElementById(id);
-  if (el) observer.observe(el);
-});
+  document.querySelectorAll('.nav-chapter').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+
+  // Also scroll active nav item into view inside sidebar
+  const activeLink = document.querySelector('.nav-chapter.active');
+  if (activeLink) {
+    activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+updateActiveNav(); // run once on load
 
 // ── Fade in on scroll ────────────────────────────────────────────
 const fadeObs = new IntersectionObserver(entries => {
