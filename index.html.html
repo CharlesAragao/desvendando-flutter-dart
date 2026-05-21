@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desvendando Flutter & Dart</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0A0E1A;
+  --bg2:       #0F1525;
+  --card:      #131929;
+  --card2:     #1A2035;
+  --border:    #1E2D4A;
+  --blue:      #4D9FFF;
+  --blue2:     #1E6FFF;
+  --cyan:      #00D4FF;
+  --green:     #00E5A0;
+  --orange:    #FF8A40;
+  --red:       #FF5C6A;
+  --yellow:    #FFD060;
+  --white:     #EEF2FF;
+  --gray:      #8899BB;
+  --gray2:     #4A5878;
+  --code-bg:   #080D1A;
+  --radius:    14px;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Sidebar ── */
+#sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--blue2), var(--cyan));
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .5px;
+  margin-bottom: 8px;
+}
+.sidebar-logo .logo-sub {
+  font-size: 11px;
+  color: var(--gray);
+  font-family: var(--font-mono);
+}
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+
+.nav-chapter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all .2s;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 500;
+}
+.nav-chapter:hover { color: var(--white); background: rgba(77,159,255,.06); }
+.nav-chapter.active {
+  color: var(--blue);
+  border-left-color: var(--blue);
+  background: rgba(77,159,255,.08);
+}
+.nav-chapter .ch-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gray2);
+  min-width: 22px;
+}
+.nav-chapter .ch-icon { font-size: 15px; min-width: 20px; text-align: center; }
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.progress-label {
+  font-size: 11px;
+  color: var(--gray);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  border-radius: 2px;
+  transition: width .5s ease;
+}
+
+/* ── Main Content ── */
+#main {
+  margin-left: 260px;
+  min-height: 100vh;
+}
+
+/* ── Hero / Cover ── */
+#cover {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 60px 40px;
+}
+
+.cover-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(77,159,255,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,159,255,.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.cover-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(30,111,255,.15) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.cover-glow2 {
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,212,255,.08) 0%, transparent 70%);
+  top: 20%; right: 10%;
+  pointer-events: none;
+}
+
+.cover-content {
+  position: relative;
+  max-width: 700px;
+  text-align: center;
+}
+.cover-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(77,159,255,.12);
+  border: 1px solid rgba(77,159,255,.25);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--blue);
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+.cover-content h1 {
+  font-family: var(--font-head);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.cover-content h1 .grad {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 50%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: shimmer 4s ease infinite;
+}
+@keyframes shimmer {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.cover-desc {
+  font-size: 18px;
+  color: var(--gray);
+  max-width: 520px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+
+.cover-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.cover-tags span {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--gray);
+}
+
+.cover-stats {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+}
+.stat { text-align: center; }
+.stat .val {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--blue);
+  display: block;
+}
+.stat .lbl { font-size: 12px; color: var(--gray); }
+
+.cover-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--gray2);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  animation: bounce 2s ease infinite;
+}
+@keyframes bounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── Chapter sections ── */
+.chapter {
+  padding: 80px 60px;
+  max-width: 960px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ch-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.ch-num-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--blue);
+  background: rgba(77,159,255,.1);
+  border: 1px solid rgba(77,159,255,.2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-top: 6px;
+}
+.ch-header h2 {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+.ch-header h2 span { color: var(--blue); }
+
+.ch-intro {
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 36px;
+  max-width: 640px;
+  line-height: 1.8;
+  border-left: 3px solid var(--blue2);
+  padding-left: 18px;
+}
+
+/* ── Content blocks ── */
+h3 {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  margin: 36px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+h3::before {
+  content: '';
+  display: block;
+  width: 4px; height: 20px;
+  background: var(--cyan);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+p { color: var(--gray); margin-bottom: 16px; line-height: 1.8; }
+p strong { color: var(--white); font-weight: 600; }
+
+/* ── Code block ── */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 20px 0;
+  position: relative;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.code-dots { display: flex; gap: 6px; }
+.code-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.code-dots span:nth-child(1) { background: #FF5F57; }
+.code-dots span:nth-child(2) { background: #FFBD2E; }
+.code-dots span:nth-child(3) { background: #28C840; }
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gray2);
+  letter-spacing: .5px;
+}
+.code-copy {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--gray);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.code-copy:hover { border-color: var(--blue); color: var(--blue); }
+pre {
+  padding: 20px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+/* Syntax colors */
+.kw  { color: #79C0FF; }
+.str { color: #A5D6A7; }
+.cmt { color: #4A5878; font-style: italic; }
+.num { color: #FFD060; }
+.fn  { color: #D2A8FF; }
+.cls { color: #00D4FF; }
+.op  { color: #FF8A40; }
+.ann { color: #FF8A40; }
+
+/* ── Info boxes ── */
+.info-box {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  margin: 20px 0;
+  border: 1px solid;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.info-box.tip    { background: rgba(0,229,160,.05); border-color: rgba(0,229,160,.2); }
+.info-box.warn   { background: rgba(255,138,64,.05); border-color: rgba(255,138,64,.2); }
+.info-box.info   { background: rgba(77,159,255,.05); border-color: rgba(77,159,255,.2); }
+.info-box.dart   { background: rgba(0,212,255,.05); border-color: rgba(0,212,255,.2); }
+.info-box .icon  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.info-box .text  { color: var(--gray); }
+.info-box .text strong { color: var(--white); }
+
+/* ── Comparison table ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.compare-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.compare-card h4 {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.compare-card.left h4 { color: var(--blue); }
+.compare-card.right h4 { color: var(--green); }
+.compare-card ul { list-style: none; }
+.compare-card ul li {
+  font-size: 13.5px;
+  color: var(--gray);
+  padding: 5px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.compare-card ul li::before {
+  content: '→';
+  color: var(--gray2);
+  flex-shrink: 0;
+}
+
+/* ── Data table ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+.data-table th {
+  background: var(--card2);
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .5px;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--gray);
+}
+.data-table td code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--code-bg);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--cyan);
+}
+.data-table tr:hover td { background: rgba(77,159,255,.03); }
+
+/* ── Widget tree visual ── */
+.widget-tree {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 20px 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.tree-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  color: var(--gray);
+  animation: fadeSlide .4s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.tree-node .node-name { color: var(--cyan); font-weight: 700; }
+.tree-node .node-prop { color: var(--gray2); font-size: 11px; }
+.tree-indent { display: inline-block; }
+
+/* ── Exercise ── */
+.exercise {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin: 40px 0;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.3);
+}
+.exercise-header {
+  background: linear-gradient(135deg, var(--card2) 0%, rgba(30,111,255,.1) 100%);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.exercise-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ex-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--blue2), var(--cyan));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.ex-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 16px;
+}
+.ex-subtitle { font-size: 12px; color: var(--gray); font-family: var(--font-mono); }
+.ex-difficulty {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.diff-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.diff-dot.on { background: var(--green); }
+.diff-dot.mid { background: var(--yellow); }
+.diff-dot.hard { background: var(--orange); }
+
+.exercise-body { padding: 24px; }
+
+.ex-instruction {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.8;
+}
+.ex-instruction strong { color: var(--white); }
+.ex-instruction code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(77,159,255,.1);
+  color: var(--blue);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* QUIZ */
+.quiz-options {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.quiz-opt {
+  background: var(--card2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all .2s;
+  font-size: 14px;
+  color: var(--gray);
+  text-align: left;
+}
+.quiz-opt:hover { border-color: var(--blue); color: var(--white); }
+.quiz-opt .opt-key {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 5px;
+  color: var(--gray2);
+  flex-shrink: 0;
+  min-width: 28px;
+  text-align: center;
+}
+.quiz-opt.correct  { border-color: var(--green);  background: rgba(0,229,160,.06); color: var(--white); }
+.quiz-opt.wrong    { border-color: var(--red);    background: rgba(255,92,106,.06); }
+.quiz-opt.disabled { pointer-events: none; opacity: .6; }
+.quiz-opt.correct .opt-key { border-color: var(--green); color: var(--green); }
+.quiz-opt.wrong   .opt-key { border-color: var(--red);   color: var(--red); }
+
+/* FILL IN THE BLANK */
+.fill-blank {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.blank-line {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--code-bg);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.blank-input {
+  background: rgba(77,159,255,.08);
+  border: 2px dashed rgba(77,159,255,.3);
+  border-radius: 6px;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 3px 10px;
+  outline: none;
+  min-width: 80px;
+  transition: all .2s;
+}
+.blank-input:focus { border-color: var(--blue); background: rgba(77,159,255,.12); }
+.blank-input.correct { border-color: var(--green); border-style: solid; color: var(--green); background: rgba(0,229,160,.06); }
+.blank-input.wrong   { border-color: var(--red);   border-style: solid; color: var(--red);   background: rgba(255,92,106,.06); }
+
+/* ORDER CHALLENGE */
+.order-items { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.order-item {
+  background: var(--card2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: grab;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--gray);
+  transition: all .2s;
+  user-select: none;
+}
+.order-item:hover { border-color: var(--blue); color: var(--white); }
+.order-item.dragging { opacity: .4; }
+.order-item.drag-over { border-color: var(--cyan); background: rgba(0,212,255,.06); }
+.order-item .drag-handle { color: var(--gray2); font-size: 12px; }
+
+/* DARTPAD */
+.dartpad-wrapper {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.dartpad-wrapper iframe {
+  width: 100%;
+  height: 480px;
+  border: none;
+  display: block;
+}
+.dartpad-tabs {
+  display: flex;
+  background: var(--card2);
+  border-bottom: 1px solid var(--border);
+}
+.dartpad-tab {
+  padding: 9px 18px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  color: var(--gray);
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+}
+.dartpad-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* Feedback */
+.ex-feedback {
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 12px;
+  display: none;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.7;
+}
+.ex-feedback.show { display: flex; }
+.ex-feedback.success { background: rgba(0,229,160,.08); border: 1px solid rgba(0,229,160,.2); color: var(--green); }
+.ex-feedback.error   { background: rgba(255,92,106,.08); border: 1px solid rgba(255,92,106,.2); color: var(--red); }
+.ex-feedback.hint    { background: rgba(255,208,96,.08); border: 1px solid rgba(255,208,96,.2); color: var(--yellow); }
+.ex-feedback .fb-icon { font-size: 18px; flex-shrink: 0; }
+
+/* Exercise footer */
+.exercise-footer {
+  padding: 16px 24px;
+  background: var(--card2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.xp-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--yellow);
+}
+.btn-check {
+  background: linear-gradient(135deg, var(--blue2), var(--cyan));
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-check:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(30,111,255,.4); }
+.btn-check:active { transform: translateY(0); }
+.btn-check:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.btn-reset {
+  background: var(--card);
+  color: var(--gray);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-reset:hover { border-color: var(--gray); color: var(--white); }
+
+/* ── XP Toast ── */
+#xp-toast {
+  position: fixed;
+  top: 24px; right: 24px;
+  background: linear-gradient(135deg, #1A3A1A, #0D2A0D);
+  border: 1px solid var(--green);
+  color: var(--green);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(-80px);
+  opacity: 0;
+  transition: all .4s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,229,160,.2);
+}
+#xp-toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── Score board ── */
+#scoreboard {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 90;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+.score-item { text-align: center; }
+.score-item .s-val {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--blue);
+  display: block;
+  line-height: 1;
+}
+.score-item .s-lbl { font-size: 10px; color: var(--gray2); margin-top: 2px; font-family: var(--font-mono); }
+.score-div { width: 1px; height: 30px; background: var(--border); }
+
+/* ── Mobile toggle ── */
+#menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px; left: 16px;
+  z-index: 200;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--white);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(-260px); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  #menu-toggle { display: flex; }
+  .chapter { padding: 60px 24px; }
+  .compare-grid { grid-template-columns: 1fr; }
+  #scoreboard { bottom: 12px; right: 12px; padding: 10px 14px; }
+}
+
+/* ── Animations ── */
+.chapter { animation: fadeIn .6s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
+
+.fade-in { opacity: 0; transform: translateY(16px); transition: all .5s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* Confetti dots for correct answer */
+@keyframes confetti {
+  0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) rotate(var(--r)); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- XP Toast -->
+<div id="xp-toast">⚡ <span id="xp-msg">+10 XP</span></div>
+
+<!-- Scoreboard -->
+<div id="scoreboard">
+  <div class="score-item">
+    <span class="s-val" id="score-xp">0</span>
+    <div class="s-lbl">XP</div>
+  </div>
+  <div class="score-div"></div>
+  <div class="score-item">
+    <span class="s-val" id="score-correct">0</span>
+    <div class="s-lbl">Acertos</div>
+  </div>
+  <div class="score-div"></div>
+  <div class="score-item">
+    <span class="s-val" id="score-streak">0</span>
+    <div class="s-lbl">Sequência 🔥</div>
+  </div>
+</div>
+
+<!-- Mobile toggle -->
+<button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge">🎯 Flutter & Dart</div>
+    <div class="logo-sub">E-book Interativo v2.0</div>
+  </div>
+  <div class="sidebar-nav">
+    <a class="nav-chapter active" href="#cover" onclick="setActive(this)">
+      <span class="ch-num">00</span>
+      <span class="ch-icon">🏠</span>
+      <span>Início</span>
+    </a>
+    <a class="nav-chapter" href="#cap1" onclick="setActive(this)">
+      <span class="ch-num">01</span>
+      <span class="ch-icon">🌍</span>
+      <span>Ecossistema Flutter</span>
+    </a>
+    <a class="nav-chapter" href="#cap2" onclick="setActive(this)">
+      <span class="ch-num">02</span>
+      <span class="ch-icon">🎯</span>
+      <span>Fundamentos Dart</span>
+    </a>
+    <a class="nav-chapter" href="#cap3" onclick="setActive(this)">
+      <span class="ch-num">03</span>
+      <span class="ch-icon">🧩</span>
+      <span>Filosofia Widgets</span>
+    </a>
+    <a class="nav-chapter" href="#cap4" onclick="setActive(this)">
+      <span class="ch-num">04</span>
+      <span class="ch-icon">🎨</span>
+      <span>Primeira Interface</span>
+    </a>
+    <a class="nav-chapter" href="#cap5" onclick="setActive(this)">
+      <span class="ch-num">05</span>
+      <span class="ch-icon">🚀</span>
+      <span>Projeto Prático</span>
+    </a>
+    <a class="nav-chapter" href="#cap6" onclick="setActive(this)">
+      <span class="ch-num">06</span>
+      <span class="ch-icon">🗺️</span>
+      <span>Próximos Passos</span>
+    </a>
+  </div>
+  <div class="sidebar-progress">
+    <div class="progress-label">
+      <span>Progresso</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div id="main">
+
+<!-- ══════════════ COVER ══════════════ -->
+<section id="cover" style="position:relative;">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-glow2"></div>
+  <div class="cover-content">
+    <div class="cover-eyebrow">⚡ E-BOOK INTERATIVO · FACULDADE CDL · 2025</div>
+    <h1>Desvendando<br><span class="grad">Flutter & Dart</span></h1>
+    <p class="cover-desc">Do zero ao primeiro app. Aprenda com exercícios práticos interativos e ganhe XP enquanto domina os fundamentos.</p>
+    <div class="cover-tags">
+      <span>#Dart</span><span>#Flutter</span><span>#Widgets</span>
+      <span>#NullSafety</span><span>#Mobile</span><span>#CrossPlatform</span>
+    </div>
+    <div class="cover-author" style="
+  background: rgba(77,159,255,.06);
+  border: 1px solid rgba(77,159,255,.2);
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 32px;
+  display: inline-block;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 2;
+">
+  <div style="color:var(--blue);font-weight:700;margin-bottom:4px;font-family:var(--font-head);font-size:15px">📋 Informações do Trabalho</div>
+  <div><span style="color:var(--gray2)">Aluno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:var(--white);font-weight:600">Charles Aragão</span></div>
+  <div><span style="color:var(--gray2)">Matrícula&nbsp;</span><span style="color:var(--white)">2025013685</span></div>
+  <div><span style="color:var(--gray2)">Professor&nbsp;&nbsp;</span><span style="color:var(--white)">Gerhard Saboia</span></div>
+  <div><span style="color:var(--gray2)">Faculdade&nbsp;</span><span style="color:var(--cyan);font-weight:600">Faculdade CDL</span></div>
+</div>
+<div class="cover-stats">
+      <div class="stat"><span class="val">6</span><div class="lbl">Capítulos</div></div>
+      <div class="stat"><span class="val">14</span><div class="lbl">Exercícios</div></div>
+      <div class="stat"><span class="val">700</span><div class="lbl">XP Total</div></div>
+    </div>
+  </div>
+  <div class="cover-scroll">▼ role para começar</div>
+</section>
+
+<!-- ══════════════ CAP 1 ══════════════ -->
+<section class="chapter" id="cap1">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 01</div>
+    <h2>Introdução ao<br><span>Ecossistema Flutter</span></h2>
+  </div>
+  <p class="ch-intro">Antes de escrever qualquer linha de código, é essencial entender o que é Flutter, qual é o papel do Dart, e por que essa combinação conquistou milhões de desenvolvedores no mundo inteiro.</p>
+
+  <h3>O que é Flutter?</h3>
+  <p>Flutter é um <strong>framework</strong> de código aberto criado pelo Google para construir aplicativos <strong>nativamente compilados</strong> para mobile (Android e iOS), web e desktop a partir de um único código-fonte.</p>
+  <p>Dart é a <strong>linguagem de programação</strong> por trás do Flutter. A distinção é fundamental: Flutter é a caixa de ferramentas (os pincéis, a tela, as tintas), enquanto Dart é o idioma com o qual você dá as instruções ao framework.</p>
+
+  <table class="data-table fade-in">
+    <thead><tr><th>Conceito</th><th>Definição</th><th>Analogia</th></tr></thead>
+    <tbody>
+      <tr><td><code>Flutter</code></td><td>Framework de UI multiplataforma</td><td>A caixa de ferramentas do artista</td></tr>
+      <tr><td><code>Dart</code></td><td>Linguagem de programação</td><td>O idioma que você fala</td></tr>
+      <tr><td><code>Widget</code></td><td>Bloco de construção da UI</td><td>Os tijolos da casa</td></tr>
+      <tr><td><code>pub.dev</code></td><td>Repositório de pacotes</td><td>A loja de materiais</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Por que Dart? Compilação AOT e JIT</h3>
+  <p>Dart suporta dois modos de compilação que tornam o desenvolvimento extremamente eficiente:</p>
+
+  <div class="compare-grid fade-in">
+    <div class="compare-card left">
+      <h4>⚡ JIT — Just-In-Time</h4>
+      <ul>
+        <li>Usado durante o <strong>desenvolvimento</strong></li>
+        <li>Habilita o famoso <strong>Hot Reload</strong></li>
+        <li>Alterou o código → vê na tela em &lt;1s</li>
+        <li>Mantém o estado do app ao recarregar</li>
+      </ul>
+    </div>
+    <div class="compare-card right">
+      <h4>🚀 AOT — Ahead-Of-Time</h4>
+      <ul>
+        <li>Usado na <strong>compilação final</strong></li>
+        <li>Converte Dart em código nativo de máquina</li>
+        <li>Performance comparável a Swift/Kotlin</li>
+        <li>Apps rápidos e eficientes em produção</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box tip fade-in">
+    <span class="icon">💡</span>
+    <div class="text"><strong>Hot Reload</strong> é o superpoder do Flutter: altere o código e veja o resultado na tela instantaneamente, mantendo o estado do app. É como atualizar uma página web, só que para apps nativos!</div>
+  </div>
+
+  <!-- EXERCÍCIO 1.1 — Quiz -->
+  <div class="exercise fade-in" id="ex1">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🧠</div>
+        <div>
+          <div class="ex-title">Quiz: Conceitos Básicos</div>
+          <div class="ex-subtitle">EXERCÍCIO 1.1 · Quiz de Múltipla Escolha</div>
+        </div>
+      </div>
+      <div>
+        <div class="ex-difficulty">
+          <span class="diff-dot on"></span>
+          <span class="diff-dot"></span>
+          <span class="diff-dot"></span>
+          <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Fácil</span>
+        </div>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        <strong>Pergunta:</strong> Qual é a diferença fundamental entre Flutter e Dart?
+      </div>
+      <div class="quiz-options" id="quiz1-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz1', 0, false)">
+          <span class="opt-key">A</span> Flutter e Dart são a mesma coisa — termos intercambiáveis.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz1', 1, true)">
+          <span class="opt-key">B</span> Flutter é o framework de UI; Dart é a linguagem de programação usada por ele.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz1', 2, false)">
+          <span class="opt-key">C</span> Dart é o framework; Flutter é apenas uma biblioteca de widgets.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz1', 3, false)">
+          <span class="opt-key">D</span> Flutter só funciona com Android; Dart funciona em qualquer plataforma.
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz1-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +30 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz1', 'ex1')">↺ Refazer</button>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 1.2 — Quiz AOT/JIT -->
+  <div class="exercise fade-in" id="ex2">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">⚡</div>
+        <div>
+          <div class="ex-title">JIT ou AOT?</div>
+          <div class="ex-subtitle">EXERCÍCIO 1.2 · Associação de Conceitos</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Fácil</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        <strong>Pergunta:</strong> Você está desenvolvendo um novo app Flutter e quer ver suas mudanças instantaneamente sem reiniciar o app. Qual modo de compilação está ativo nesse momento?
+      </div>
+      <div class="quiz-options" id="quiz2-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz2', 0, false)">
+          <span class="opt-key">A</span> AOT (Ahead-Of-Time) — compila para código nativo otimizado.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz2', 1, true)">
+          <span class="opt-key">B</span> JIT (Just-In-Time) — permite Hot Reload durante o desenvolvimento.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz2', 2, false)">
+          <span class="opt-key">C</span> Ambos são usados ao mesmo tempo sempre.
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz2-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +30 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz2', 'ex2')">↺ Refazer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAP 2 ══════════════ -->
+<section class="chapter" id="cap2">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 02</div>
+    <h2>Fundamentos da<br><span>Linguagem Dart</span></h2>
+  </div>
+  <p class="ch-intro">Dart é uma linguagem fortemente tipada com inferência de tipos, suporte a programação orientada a objetos e recursos modernos como Null Safety. Vamos dominar os fundamentos que você vai usar todos os dias.</p>
+
+  <h3>Variáveis e Tipagem</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">main.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="cmt">// Tipagem explícita</span>
+<span class="kw">String</span> nome = <span class="str">'Flutter'</span>;
+<span class="kw">int</span> versao = <span class="num">3</span>;
+<span class="kw">double</span> pi = <span class="num">3.14159</span>;
+<span class="kw">bool</span> ativo = <span class="kw">true</span>;
+
+<span class="cmt">// Inferência de tipo com 'var'</span>
+<span class="kw">var</span> linguagem = <span class="str">'Dart'</span>;   <span class="cmt">// Dart infere: String</span>
+<span class="kw">var</span> ano = <span class="num">2025</span>;           <span class="cmt">// Dart infere: int</span>
+
+<span class="cmt">// Imutabilidade</span>
+<span class="kw">final</span> cidade = <span class="str">'São Paulo'</span>;   <span class="cmt">// Definido em runtime, não muda</span>
+<span class="kw">const</span> PI = <span class="num">3.14159</span>;           <span class="cmt">// Constante em tempo de compilação</span></pre>
+  </div>
+
+  <table class="data-table fade-in">
+    <thead><tr><th>Keyword</th><th>Mutável?</th><th>Quando usar</th></tr></thead>
+    <tbody>
+      <tr><td><code>var</code></td><td>✅ Sim</td><td>Tipo inferido, pode ser reatribuído</td></tr>
+      <tr><td><code>String/int/double</code></td><td>✅ Sim</td><td>Tipagem explícita, mais legível</td></tr>
+      <tr><td><code>final</code></td><td>❌ Não</td><td>Atribuído uma vez em runtime. Objetos não-nulos.</td></tr>
+      <tr><td><code>const</code></td><td>❌ Não</td><td>Constante em tempo de compilação. Valores literais.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Null Safety: o fim dos crashes de null</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">null_safety.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="cmt">// Sem Null Safety (❌ perigoso)</span>
+<span class="kw">String</span> nome;   <span class="cmt">// Poderia ser null → crash em runtime!</span>
+
+<span class="cmt">// COM Null Safety (✅ seguro)</span>
+<span class="kw">String</span> nome = <span class="str">'Ana'</span>;       <span class="cmt">// Nunca pode ser null</span>
+<span class="kw">String</span>? apelido;           <span class="cmt">// Pode ser null (o '?' declara isso)</span>
+
+<span class="cmt">// Operador '?.' — acesso seguro (retorna null se null)</span>
+print(apelido?.<span class="fn">length</span>);    <span class="cmt">// Safe: retorna null se apelido for null</span>
+
+<span class="cmt">// Operador '!' — afirma que NÃO é null (use com certeza!)</span>
+print(apelido!.<span class="fn">length</span>);    <span class="cmt">// Força acesso; pode dar erro!</span>
+
+<span class="cmt">// Operador '??' — valor padrão se null</span>
+<span class="kw">String</span> exibir = apelido ?? <span class="str">'sem apelido'</span>;</pre>
+  </div>
+
+  <div class="info-box warn fade-in">
+    <span class="icon">⚠️</span>
+    <div class="text"><strong>Regra de ouro:</strong> Use <code>?</code> quando o valor realmente PODE ser nulo. Use <code>!</code> somente quando você tem certeza absoluta que não é nulo — caso contrário, você terá um erro em runtime.</div>
+  </div>
+
+  <h3>Arrow Functions e Funções</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">functions.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="cmt">// Função tradicional</span>
+<span class="kw">int</span> <span class="fn">somar</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cmt">// Arrow Function (=>) — para uma única expressão</span>
+<span class="kw">int</span> <span class="fn">somar</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) <span class="op">=></span> a + b;
+
+<span class="cmt">// Parâmetros nomeados e opcionais</span>
+<span class="kw">void</span> <span class="fn">saudacao</span>({<span class="kw">required String</span> nome, <span class="kw">String</span> titulo = <span class="str">'Dev'</span>}) {
+  print(<span class="str">'Olá, $titulo $nome!'</span>);
+}
+<span class="fn">saudacao</span>(nome: <span class="str">'Ana'</span>, titulo: <span class="str">'Sênior'</span>);</pre>
+  </div>
+
+  <!-- EXERCÍCIO 2.1 — Preencher lacunas -->
+  <div class="exercise fade-in" id="ex3">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">✏️</div>
+        <div>
+          <div class="ex-title">Complete o Código</div>
+          <div class="ex-subtitle">EXERCÍCIO 2.1 · Preencher Lacunas</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Médio</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        Complete as declarações de variáveis corretamente. Digite a <strong>keyword</strong> certa em cada lacuna.
+      </div>
+      <div class="fill-blank" id="fill1">
+        <div class="blank-line">
+          <input class="blank-input" id="f1_1" placeholder="???" style="width:70px"> nome = <span class="str">'Flutter'</span>;&nbsp;&nbsp;<span style="color:var(--gray2);font-size:11px">// String explícita que pode mudar</span>
+        </div>
+        <div class="blank-line">
+          <input class="blank-input" id="f1_2" placeholder="???" style="width:70px"> versao = <span class="num">3</span>;&nbsp;&nbsp;<span style="color:var(--gray2);font-size:11px">// inferência de tipo</span>
+        </div>
+        <div class="blank-line">
+          <input class="blank-input" id="f1_3" placeholder="???" style="width:70px"> PI = <span class="num">3.14</span>;&nbsp;&nbsp;<span style="color:var(--gray2);font-size:11px">// constante de compilação</span>
+        </div>
+        <div class="blank-line">
+          <span class="kw">String</span><input class="blank-input" id="f1_4" placeholder="???" style="width:30px"> apelido;&nbsp;&nbsp;<span style="color:var(--gray2);font-size:11px">// pode ser null</span>
+        </div>
+      </div>
+      <div class="ex-feedback" id="fill1-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +50 XP ao acertar tudo</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-reset" onclick="resetFill('fill1')">↺ Refazer</button>
+        <button class="btn-check" onclick="checkFill1()">✓ Verificar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 2.2 — Quiz Null Safety -->
+  <div class="exercise fade-in" id="ex4">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🛡️</div>
+        <div>
+          <div class="ex-title">Null Safety na Prática</div>
+          <div class="ex-subtitle">EXERCÍCIO 2.2 · Quiz</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Médio</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        Dado o código: <code>String? email;</code><br>
+        O que acontece ao executar <code>print(email.length)</code>?
+      </div>
+      <div class="quiz-options" id="quiz3-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz3', 0, false)">
+          <span class="opt-key">A</span> Imprime 0 (string vazia tem comprimento zero).
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz3', 1, false)">
+          <span class="opt-key">B</span> Imprime null.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz3', 2, true)">
+          <span class="opt-key">C</span> Erro de compilação: email pode ser null, use email?.length ou email!.length.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz3', 3, false)">
+          <span class="opt-key">D</span> Crash em runtime com NullPointerException.
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz3-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +30 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz3', 'ex4')">↺ Refazer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAP 3 ══════════════ -->
+<section class="chapter" id="cap3">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 03</div>
+    <h2>A Filosofia dos<br><span>Widgets</span></h2>
+  </div>
+  <p class="ch-intro">No Flutter, <strong>tudo é widget</strong>. Textos, botões, imagens, layouts, animações e até o próprio app são widgets. Entender essa filosofia é a chave para pensar em Flutter.</p>
+
+  <h3>A Widget Tree</h3>
+  <p>Os widgets se organizam em uma hierarquia chamada <strong>Widget Tree</strong>. Cada widget pode ter filhos (children), formando uma árvore que representa toda a UI do app.</p>
+
+  <div class="widget-tree fade-in" id="widget-tree-demo">
+    <div class="tree-node" style="animation-delay:.0s"><span class="node-name">MaterialApp</span></div>
+    <div class="tree-node" style="animation-delay:.1s"><span class="tree-indent">  └── </span><span class="node-name">Scaffold</span></div>
+    <div class="tree-node" style="animation-delay:.2s"><span class="tree-indent">        ├── </span><span class="node-name">AppBar</span></div>
+    <div class="tree-node" style="animation-delay:.3s"><span class="tree-indent">        │     └── </span><span class="node-name">Text</span><span class="node-prop">('Meu App')</span></div>
+    <div class="tree-node" style="animation-delay:.4s"><span class="tree-indent">        └── </span><span class="node-name">Center</span></div>
+    <div class="tree-node" style="animation-delay:.5s"><span class="tree-indent">              └── </span><span class="node-name">Column</span></div>
+    <div class="tree-node" style="animation-delay:.6s"><span class="tree-indent">                    ├── </span><span class="node-name">Text</span><span class="node-prop">('Olá!')</span></div>
+    <div class="tree-node" style="animation-delay:.7s"><span class="tree-indent">                    └── </span><span class="node-name">ElevatedButton</span></div>
+  </div>
+
+  <h3>Stateless vs. Stateful</h3>
+  <p>Esta é a dúvida mais comum entre iniciantes. A resposta é simples: tudo depende de se o widget precisa <strong>mudar durante a vida do app</strong>.</p>
+
+  <div class="compare-grid fade-in">
+    <div class="compare-card left">
+      <h4>StatelessWidget</h4>
+      <ul>
+        <li>Imutável após criação</li>
+        <li>Não tem estado interno</li>
+        <li>Mais performático (sem rebuild desnecessário)</li>
+        <li>Ideal para: cards, textos, ícones fixos</li>
+        <li>Exemplo: um card de produto estático</li>
+      </ul>
+    </div>
+    <div class="compare-card right">
+      <h4>StatefulWidget</h4>
+      <ul>
+        <li>Tem estado que pode mudar</li>
+        <li>Usa <code>setState()</code> para notificar mudanças</li>
+        <li>Flutter reconstrói o widget ao chamar setState</li>
+        <li>Ideal para: contadores, formulários, animações</li>
+        <li>Exemplo: botão de curtir, carrinho de compras</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Widgets de Layout Essenciais</h3>
+  <table class="data-table fade-in">
+    <thead><tr><th>Widget</th><th>Função</th></tr></thead>
+    <tbody>
+      <tr><td><code>Scaffold</code></td><td>Estrutura base da tela. Fornece AppBar, body, FAB e Drawer.</td></tr>
+      <tr><td><code>AppBar</code></td><td>Barra superior com título, ações e botão de navegação.</td></tr>
+      <tr><td><code>Center</code></td><td>Centraliza o filho horizontal e verticalmente.</td></tr>
+      <tr><td><code>Column</code></td><td>Empilha widgets verticalmente (um abaixo do outro).</td></tr>
+      <tr><td><code>Row</code></td><td>Alinha widgets horizontalmente (lado a lado).</td></tr>
+      <tr><td><code>Container</code></td><td>Caixa versátil: padding, margin, cor, decoração, tamanho.</td></tr>
+      <tr><td><code>Expanded</code></td><td>Preenche o espaço disponível dentro de Column/Row.</td></tr>
+      <tr><td><code>SizedBox</code></td><td>Espaço fixo entre widgets (como margem manual).</td></tr>
+    </tbody>
+  </table>
+
+  <!-- EXERCÍCIO 3.1 — Ordenar a Widget Tree -->
+  <div class="exercise fade-in" id="ex5">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🌳</div>
+        <div>
+          <div class="ex-title">Monte a Widget Tree</div>
+          <div class="ex-subtitle">EXERCÍCIO 3.1 · Ordenar Hierarquia</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Médio</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        Arraste os widgets para colocá-los na <strong>ordem correta</strong> da hierarquia Flutter (de mais externo para mais interno). Um app simples com texto centralizado.
+      </div>
+      <div class="order-items" id="order1" ondragover="event.preventDefault()">
+        <div class="order-item" draggable="true" data-val="3" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event,'order1')">
+          <span class="drag-handle">⠿</span> <span class="kw" style="color:var(--cyan)">Center</span>
+        </div>
+        <div class="order-item" draggable="true" data-val="1" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event,'order1')">
+          <span class="drag-handle">⠿</span> <span class="kw" style="color:var(--cyan)">MaterialApp</span>
+        </div>
+        <div class="order-item" draggable="true" data-val="4" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event,'order1')">
+          <span class="drag-handle">⠿</span> <span class="kw" style="color:var(--cyan)">Text</span>
+        </div>
+        <div class="order-item" draggable="true" data-val="2" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event,'order1')">
+          <span class="drag-handle">⠿</span> <span class="kw" style="color:var(--cyan)">Scaffold</span>
+        </div>
+      </div>
+      <div class="ex-feedback" id="order1-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +50 XP ao acertar</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-reset" onclick="resetOrder('order1')">↺ Embaralhar</button>
+        <button class="btn-check" onclick="checkOrder('order1','order1-fb', [1,2,3,4])">✓ Verificar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 3.2 — Quiz Stateless vs Stateful -->
+  <div class="exercise fade-in" id="ex6">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🤔</div>
+        <div>
+          <div class="ex-title">Stateless ou Stateful?</div>
+          <div class="ex-subtitle">EXERCÍCIO 3.2 · Tomada de Decisão</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot hard"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Difícil</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        Você precisa criar um widget que exibe o <strong>nome e foto de um produto</strong> em um catálogo. Os dados nunca mudam depois de exibidos. Qual tipo de widget você deve usar?
+      </div>
+      <div class="quiz-options" id="quiz4-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz4', 0, true)">
+          <span class="opt-key">A</span> StatelessWidget — pois os dados são fixos e não há estado interno que muda.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz4', 1, false)">
+          <span class="opt-key">B</span> StatefulWidget — sempre é mais seguro usar Stateful para qualquer widget.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz4', 2, false)">
+          <span class="opt-key">C</span> Depende do sistema operacional (Android usa Stateless, iOS usa Stateful).
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz4-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +30 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz4', 'ex6')">↺ Refazer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAP 4 ══════════════ -->
+<section class="chapter" id="cap4">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 04</div>
+    <h2>Criando a<br><span>Primeira Interface</span></h2>
+  </div>
+  <p class="ch-intro">Hora de colocar a mão na massa! Vamos ver como estilizar widgets com TextStyle e BoxDecoration, e como adicionar interatividade com setState.</p>
+
+  <h3>Estilização com TextStyle</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">styling.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="cls">Text</span>(
+  <span class="str">'Flutter é incrível!'</span>,
+  style: <span class="cls">TextStyle</span>(
+    fontSize: <span class="num">24</span>,
+    fontWeight: <span class="cls">FontWeight</span>.bold,
+    color: <span class="cls">Colors</span>.blue,
+    letterSpacing: <span class="num">1.5</span>,
+    fontStyle: <span class="cls">FontStyle</span>.italic,
+  ),
+)</pre>
+  </div>
+
+  <h3>BoxDecoration: estilizando Containers</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">decoration.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="cls">Container</span>(
+  padding: <span class="cls">EdgeInsets</span>.all(<span class="num">16</span>),
+  margin: <span class="cls">EdgeInsets</span>.symmetric(horizontal: <span class="num">20</span>),
+  decoration: <span class="cls">BoxDecoration</span>(
+    color: <span class="cls">Colors</span>.blue[<span class="num">100</span>],
+    borderRadius: <span class="cls">BorderRadius</span>.circular(<span class="num">12</span>),
+    boxShadow: [
+      <span class="cls">BoxShadow</span>(
+        blurRadius: <span class="num">8</span>,
+        color: <span class="cls">Colors</span>.black26,
+        offset: <span class="cls">Offset</span>(<span class="num">0</span>, <span class="num">4</span>),
+      )
+    ],
+  ),
+  child: <span class="cls">Text</span>(<span class="str">'Card estilizado'</span>),
+)</pre>
+  </div>
+
+  <h3>setState: dando vida à interface</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">counter.dart</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">BotaoContador</span> <span class="kw">extends</span> <span class="cls">StatefulWidget</span> {
+  <span class="ann">@override</span>
+  <span class="cls">State</span>&lt;<span class="cls">BotaoContador</span>&gt; <span class="fn">createState</span>() <span class="op">=></span> _BotaoContadorState();
+}
+
+<span class="kw">class</span> <span class="cls">_BotaoContadorState</span> <span class="kw">extends</span> <span class="cls">State</span>&lt;<span class="cls">BotaoContador</span>&gt; {
+  <span class="kw">int</span> _contagem = <span class="num">0</span>;
+
+  <span class="kw">void</span> <span class="fn">_incrementar</span>() {
+    <span class="fn">setState</span>(() {          <span class="cmt">// Notifica o Flutter para rebuild</span>
+      _contagem++;         <span class="cmt">// Atualiza o estado</span>
+    });
+  }
+
+  <span class="ann">@override</span>
+  <span class="cls">Widget</span> <span class="fn">build</span>(<span class="cls">BuildContext</span> context) {
+    <span class="kw">return</span> <span class="cls">ElevatedButton</span>(
+      onPressed: _incrementar,
+      child: <span class="cls">Text</span>(<span class="str">'Cliques: $_contagem'</span>),
+    );
+  }
+}</pre>
+  </div>
+
+  <div class="info-box info fade-in">
+    <span class="icon">ℹ️</span>
+    <div class="text"><strong>Como funciona o setState:</strong> quando você chama <code>setState(() { ... })</code>, o Flutter marca o widget como "sujo" e chama o método <code>build()</code> novamente, reconstruindo a UI com os novos valores de estado.</div>
+  </div>
+
+  <!-- EXERCÍCIO 4.1 — Completar o setState -->
+  <div class="exercise fade-in" id="ex7">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🔧</div>
+        <div>
+          <div class="ex-title">Conserte o setState</div>
+          <div class="ex-subtitle">EXERCÍCIO 4.1 · Preencher Lacunas</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Médio</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        Complete o código para que o botão <strong>decremente</strong> a contagem corretamente. Preencha as lacunas com as keywords/valores corretos.
+      </div>
+      <div class="fill-blank" id="fill2">
+        <div class="blank-line">
+          <span class="kw">class</span> <span class="cls">Contador</span> <span class="kw">extends</span> <input class="blank-input" id="f2_1" placeholder="???" style="width:120px"> {'{'}</div>
+        <div class="blank-line">
+          &nbsp;&nbsp;<input class="blank-input" id="f2_2" placeholder="???" style="width:60px"> _count = <span class="num">0</span>;
+        </div>
+        <div class="blank-line">
+          &nbsp;&nbsp;<span class="kw">void</span> <span class="fn">decrementar</span>() {'{'} <input class="blank-input" id="f2_3" placeholder="???" style="width:90px">(() {'{'} _count--; {'}'}); {'}'}
+        </div>
+      </div>
+      <div class="ex-feedback" id="fill2-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +50 XP ao acertar tudo</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-reset" onclick="resetFill('fill2')">↺ Refazer</button>
+        <button class="btn-check" onclick="checkFill2()">✓ Verificar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 4.2 — DartPad ao vivo -->
+  <div class="exercise fade-in" id="ex8">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🎮</div>
+        <div>
+          <div class="ex-title">Pratique no DartPad</div>
+          <div class="ex-subtitle">EXERCÍCIO 4.2 · Código Ao Vivo</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot hard"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Difícil</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        <strong>Desafio:</strong> No DartPad abaixo, há um app com um contador que só incrementa. Sua tarefa é:<br>
+        1. Adicionar um <strong>segundo botão</strong> que <strong>decrementa</strong> o contador<br>
+        2. Impedir que o contador fique abaixo de <strong>zero</strong><br>
+        Clique em <strong>Run</strong> para ver o resultado!
+      </div>
+      <div class="dartpad-wrapper">
+        <iframe src="https://dartpad.dev/embed-flutter.html?split=60&theme=dark&run=true&null_safety=true&code=import%20%27package%3Aflutter%2Fmaterial.dart%27%3B%0A%0Avoid%20main%28%29%20%3D%3E%20runApp%28const%20MyApp%28%29%29%3B%0A%0Aclass%20MyApp%20extends%20StatelessWidget%20%7B%0A%20%20const%20MyApp%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20MaterialApp%28%0A%20%20%20%20%20%20theme%3A%20ThemeData%28colorScheme%3A%20ColorScheme.fromSeed%28seedColor%3A%20Colors.indigo%29%29%2C%0A%20%20%20%20%20%20home%3A%20const%20CounterPage%28%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D%0A%0Aclass%20CounterPage%20extends%20StatefulWidget%20%7B%0A%20%20const%20CounterPage%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20State%3CCounterPage%3E%20createState%28%29%20%3D%3E%20_CounterPageState%28%29%3B%0A%7D%0A%0Aclass%20_CounterPageState%20extends%20State%3CCounterPage%3E%20%7B%0A%20%20int%20_count%20%3D%200%3B%0A%20%20%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20Scaffold%28%0A%20%20%20%20%20%20appBar%3A%20AppBar%28title%3A%20const%20Text%28%27Contador%27%29%29%2C%0A%20%20%20%20%20%20body%3A%20Center%28%0A%20%20%20%20%20%20%20%20child%3A%20Column%28%0A%20%20%20%20%20%20%20%20%20%20mainAxisAlignment%3A%20MainAxisAlignment.center%2C%0A%20%20%20%20%20%20%20%20%20%20children%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20Text%28%27%24_count%27%2C%20style%3A%20const%20TextStyle%28fontSize%3A%2048%29%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20SizedBox%28height%3A%2024%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20ElevatedButton%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20onPressed%3A%20%28%29%20%3D%3E%20setState%28%28%29%20%3D%3E%20_count%2B%2B%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20child%3A%20const%20Text%28%27%2B1%20Incrementar%27%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20TODO%3A%20Adicione%20um%20bot%C3%A3o%20de%20decrementar%20aqui!%0A%20%20%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D" title="DartPad - Exercício 4.2" loading="lazy"></iframe>
+      </div>
+      <div class="info-box tip" style="margin-top:0">
+        <span class="icon">💡</span>
+        <div class="text"><strong>Dica:</strong> Adicione um <code>ElevatedButton</code> após o existente. Na função <code>onPressed</code>, use <code>setState(() => if (_count > 0) _count--)</code> para não deixar ir abaixo de zero.</div>
+      </div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +80 XP ao completar</div>
+      <button class="btn-check" onclick="markDartpadDone('ex8', 80)">✓ Completei o Desafio!</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAP 5 ══════════════ -->
+<section class="chapter" id="cap5">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 05</div>
+    <h2>Projeto Prático:<br><span>Gerador de Frases Nerds</span></h2>
+  </div>
+  <p class="ch-intro">Vamos construir um app completo que une tudo que aprendemos: listas, estado, UI e interatividade. O <strong>Gerador de Frases Nerds</strong> exibe uma frase aleatória ao apertar um botão.</p>
+
+  <h3>Estrutura do Projeto</h3>
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">main.dart — Parte 1: Setup</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="kw">import</span> <span class="str">'dart:math'</span>;
+<span class="kw">import</span> <span class="str">'package:flutter/material.dart'</span>;
+
+<span class="kw">void</span> <span class="fn">main</span>() <span class="op">=></span> <span class="fn">runApp</span>(<span class="kw">const</span> <span class="cls">MeuApp</span>());
+
+<span class="kw">class</span> <span class="cls">MeuApp</span> <span class="kw">extends</span> <span class="cls">StatelessWidget</span> {
+  <span class="kw">const</span> <span class="cls">MeuApp</span>({super.key});
+  <span class="ann">@override</span>
+  <span class="cls">Widget</span> <span class="fn">build</span>(<span class="cls">BuildContext</span> context) {
+    <span class="kw">return</span> <span class="cls">MaterialApp</span>(
+      title: <span class="str">'Frases Nerds'</span>,
+      theme: <span class="cls">ThemeData</span>(
+        colorScheme: <span class="cls">ColorScheme</span>.<span class="fn">fromSeed</span>(
+          seedColor: <span class="cls">Colors</span>.indigo,
+          brightness: <span class="cls">Brightness</span>.dark,
+        ),
+      ),
+      home: <span class="kw">const</span> <span class="cls">GeradorFrases</span>(),
+    );
+  }
+}</pre>
+  </div>
+
+  <div class="code-block fade-in">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">main.dart — Parte 2: Lógica e UI</div>
+      <button class="code-copy" onclick="copyCode(this)">copiar</button>
+    </div>
+    <pre><span class="kw">class</span> <span class="cls">GeradorFrases</span> <span class="kw">extends</span> <span class="cls">StatefulWidget</span> {
+  <span class="kw">const</span> <span class="cls">GeradorFrases</span>({super.key});
+  <span class="ann">@override</span>
+  <span class="cls">State</span>&lt;<span class="cls">GeradorFrases</span>&gt; <span class="fn">createState</span>() <span class="op">=></span> _GeradorFrasesState();
+}
+
+<span class="kw">class</span> <span class="cls">_GeradorFrasesState</span> <span class="kw">extends</span> <span class="cls">State</span>&lt;<span class="cls">GeradorFrases</span>&gt; {
+  <span class="kw">final</span> <span class="cls">List</span>&lt;<span class="kw">String</span>&gt; _frases = [
+    <span class="str">'There are 10 types of people...'</span>,
+    <span class="str">'It works on my machine!'</span>,
+    <span class="str">'sudo make me a sandwich'</span>,
+    <span class="str">'Dart is the best language!'</span>,
+    <span class="str">'99 bugs in the code...'</span>,
+  ];
+
+  <span class="kw">String</span> _fraseAtual = <span class="str">'Toque para gerar!'</span>;
+  <span class="kw">int</span> _contador = <span class="num">0</span>;
+  <span class="kw">final</span> _random = <span class="cls">Random</span>();
+
+  <span class="kw">void</span> <span class="fn">_gerarFrase</span>() {
+    <span class="fn">setState</span>(() {
+      _fraseAtual = _frases[_random.<span class="fn">nextInt</span>(_frases.length)];
+      _contador++;
+    });
+  }
+
+  <span class="ann">@override</span>
+  <span class="cls">Widget</span> <span class="fn">build</span>(<span class="cls">BuildContext</span> context) {
+    <span class="kw">return</span> <span class="cls">Scaffold</span>(
+      appBar: <span class="cls">AppBar</span>(title: <span class="kw">const</span> <span class="cls">Text</span>(<span class="str">'🚀 Frases Nerds'</span>)),
+      body: <span class="cls">Center</span>(
+        child: <span class="cls">Column</span>(
+          mainAxisAlignment: <span class="cls">MainAxisAlignment</span>.center,
+          children: [
+            <span class="cls">Text</span>(<span class="str">'Geradas: $_contador'</span>),
+            <span class="kw">const</span> <span class="cls">SizedBox</span>(height: <span class="num">24</span>),
+            <span class="cls">Card</span>(child: <span class="cls">Padding</span>(
+              padding: <span class="kw">const</span> <span class="cls">EdgeInsets</span>.all(<span class="num">20</span>),
+              child: <span class="cls">Text</span>(_fraseAtual,
+                style: <span class="kw">const</span> <span class="cls">TextStyle</span>(fontSize: <span class="num">20</span>),
+                textAlign: <span class="cls">TextAlign</span>.center),
+            )),
+            <span class="kw">const</span> <span class="cls">SizedBox</span>(height: <span class="num">32</span>),
+            <span class="cls">ElevatedButton</span>.icon(
+              onPressed: _gerarFrase,
+              icon: <span class="kw">const</span> <span class="cls">Icon</span>(<span class="cls">Icons</span>.refresh),
+              label: <span class="kw">const</span> <span class="cls">Text</span>(<span class="str">'Nova Frase!'</span>),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}</pre>
+  </div>
+
+  <!-- EXERCÍCIO 5.1 — DartPad com projeto completo -->
+  <div class="exercise fade-in" id="ex9">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🚀</div>
+        <div>
+          <div class="ex-title">Rode o Projeto Completo</div>
+          <div class="ex-subtitle">EXERCÍCIO 5.1 · Projeto no DartPad</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot hard"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Difícil</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        O app do Gerador de Frases está pronto abaixo. <strong>Rode, teste e então modifique:</strong><br>
+        1. Adicione <strong>3 novas frases nerds</strong> à lista<br>
+        2. Mude a cor do botão para <code>Colors.green</code><br>
+        3. Exiba a frase em <strong>itálico</strong>
+      </div>
+      <div class="dartpad-wrapper">
+        <iframe src="https://dartpad.dev/embed-flutter.html?split=60&theme=dark&run=true&null_safety=true&code=import%20%27dart%3Amath%27%3B%0Aimport%20%27package%3Aflutter%2Fmaterial.dart%27%3B%0A%0Avoid%20main%28%29%20%3D%3E%20runApp%28const%20MeuApp%28%29%29%3B%0A%0Aclass%20MeuApp%20extends%20StatelessWidget%20%7B%0A%20%20const%20MeuApp%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20MaterialApp%28%0A%20%20%20%20%20%20theme%3A%20ThemeData%28colorScheme%3A%20ColorScheme.fromSeed%28seedColor%3A%20Colors.indigo%2C%20brightness%3A%20Brightness.dark%29%29%2C%0A%20%20%20%20%20%20home%3A%20const%20GeradorFrases%28%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D%0A%0Aclass%20GeradorFrases%20extends%20StatefulWidget%20%7B%0A%20%20const%20GeradorFrases%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20State%3CGeradorFrases%3E%20createState%28%29%20%3D%3E%20_GeradorFrasesState%28%29%3B%0A%7D%0A%0Aclass%20_GeradorFrasesState%20extends%20State%3CGeradorFrases%3E%20%7B%0A%20%20final%20List%3CString%3E%20_frases%20%3D%20%5B%0A%20%20%20%20%27There%20are%2010%20types%20of%20people...%27%2C%0A%20%20%20%20%27It%20works%20on%20my%20machine%21%27%2C%0A%20%20%20%20%27sudo%20make%20me%20a%20sandwich%27%2C%0A%20%20%20%20%27Dart%20is%20awesome%21%27%2C%0A%20%20%20%20%2799%20bugs%20in%20the%20code...%27%2C%0A%20%20%5D%3B%0A%20%20String%20_fraseAtual%20%3D%20%27Toque%20para%20gerar%21%27%3B%0A%20%20int%20_contador%20%3D%200%3B%0A%20%20final%20_random%20%3D%20Random%28%29%3B%0A%20%20void%20_gerarFrase%28%29%20%7B%0A%20%20%20%20setState%28%28%29%20%7B%0A%20%20%20%20%20%20_fraseAtual%20%3D%20_frases%5B_random.nextInt%28_frases.length%29%5D%3B%0A%20%20%20%20%20%20_contador%2B%2B%3B%0A%20%20%20%20%7D%29%3B%0A%20%20%7D%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20Scaffold%28%0A%20%20%20%20%20%20appBar%3A%20AppBar%28title%3A%20const%20Text%28%27%F0%9F%9A%80%20Frases%20Nerds%27%29%29%2C%0A%20%20%20%20%20%20body%3A%20Center%28%0A%20%20%20%20%20%20%20%20child%3A%20Padding%28%0A%20%20%20%20%20%20%20%20%20%20padding%3A%20const%20EdgeInsets.all%2824%29%2C%0A%20%20%20%20%20%20%20%20%20%20child%3A%20Column%28%0A%20%20%20%20%20%20%20%20%20%20%20%20mainAxisAlignment%3A%20MainAxisAlignment.center%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20children%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20Text%28%27Frases%20geradas%3A%20%24_contador%27%2C%20style%3A%20const%20TextStyle%28color%3A%20Colors.grey%29%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20SizedBox%28height%3A%2024%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20Card%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20child%3A%20Padding%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%20const%20EdgeInsets.all%2820%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20child%3A%20Text%28_fraseAtual%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20style%3A%20const%20TextStyle%28fontSize%3A%2020%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20textAlign%3A%20TextAlign.center%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20SizedBox%28height%3A%2032%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20ElevatedButton.icon%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20onPressed%3A%20_gerarFrase%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20icon%3A%20const%20Icon%28Icons.refresh%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20label%3A%20const%20Text%28%27Nova%20Frase%21%27%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%20%20%29%2C%0A%20%20%20%20%20%20%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D" title="DartPad - Projeto Frases Nerds" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +80 XP ao completar</div>
+      <button class="btn-check" onclick="markDartpadDone('ex9', 80)">✓ Completei os 3 desafios!</button>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO 5.2 — Quiz de revisão -->
+  <div class="exercise fade-in" id="ex10">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🧩</div>
+        <div>
+          <div class="ex-title">Revisão do Projeto</div>
+          <div class="ex-subtitle">EXERCÍCIO 5.2 · Quiz de Revisão</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Médio</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        No projeto Gerador de Frases, o método <code>_gerarFrase()</code> usa <code>setState</code>. O que aconteceria se removêssemos o <code>setState</code> e atualizássemos <code>_fraseAtual</code> diretamente?
+      </div>
+      <div class="quiz-options" id="quiz5-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz5', 0, false)">
+          <span class="opt-key">A</span> O app funcionaria normalmente — setState é opcional.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz5', 1, true)">
+          <span class="opt-key">B</span> A variável mudaria em memória, mas a UI não seria atualizada na tela.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz5', 2, false)">
+          <span class="opt-key">C</span> O app travaria com um erro de compilação.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz5', 3, false)">
+          <span class="opt-key">D</span> A frase mudaria, mas o contador ficaria zerado.
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz5-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +30 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz5', 'ex10')">↺ Refazer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CAP 6 ══════════════ -->
+<section class="chapter" id="cap6">
+  <div class="ch-header">
+    <div class="ch-num-badge">CAP. 06</div>
+    <h2>Próximos<br><span>Passos</span></h2>
+  </div>
+  <p class="ch-intro">Parabéns por chegar até aqui! Você dominou os fundamentos do Flutter e Dart. Este é só o começo — o ecossistema Flutter é rico e a comunidade é extremamente ativa.</p>
+
+  <h3>Recursos Oficiais</h3>
+  <table class="data-table fade-in">
+    <thead><tr><th>Recurso</th><th>O que você encontra</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://flutter.dev" target="_blank" style="color:var(--blue)">flutter.dev</a></td><td>Documentação oficial, codelabs, exemplos e guias</td></tr>
+      <tr><td><a href="https://dart.dev" target="_blank" style="color:var(--blue)">dart.dev</a></td><td>Docs do Dart, tour da linguagem e DartPad</td></tr>
+      <tr><td><a href="https://pub.dev" target="_blank" style="color:var(--blue)">pub.dev</a></td><td>Repositório de pacotes Flutter/Dart</td></tr>
+      <tr><td><a href="https://dartpad.dev" target="_blank" style="color:var(--blue)">dartpad.dev</a></td><td>Editor online — teste código sem instalar nada</td></tr>
+      <tr><td>YouTube Flutter</td><td>Canal oficial com tutoriais em vídeo</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Roadmap Sugerido</h3>
+  <table class="data-table fade-in">
+    <thead><tr><th>Período</th><th>Foco de Estudo</th></tr></thead>
+    <tbody>
+      <tr><td>Semana 1–2</td><td>Funções, classes, herança e mixins em Dart</td></tr>
+      <tr><td>Semana 3–4</td><td>Widgets avançados: ListView, GridView, Navigator e rotas</td></tr>
+      <tr><td>Mês 2</td><td>Gerenciamento de estado: Provider, Riverpod ou Bloc</td></tr>
+      <tr><td>Mês 3</td><td>APIs REST com http package + processamento de JSON</td></tr>
+      <tr><td>Mês 4+</td><td>Firebase, animações, testes e publicação nas stores</td></tr>
+    </tbody>
+  </table>
+
+  <!-- EXERCÍCIO FINAL — Quiz geral -->
+  <div class="exercise fade-in" id="ex11">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🏆</div>
+        <div>
+          <div class="ex-title">Desafio Final</div>
+          <div class="ex-subtitle">EXERCÍCIO 6.1 · Revisão Completa</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot hard"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Difícil</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        <strong>Questão final:</strong> Você quer criar um widget que:<br>
+        • Exibe uma lista de tarefas ✅<br>
+        • Permite marcar/desmarcar tarefas (muda visualmente)<br>
+        • Conta quantas tarefas foram concluídas<br><br>
+        Qual abordagem está <strong>completamente correta</strong>?
+      </div>
+      <div class="quiz-options" id="quiz6-opts">
+        <button class="quiz-opt" onclick="checkQuiz('quiz6', 0, false)">
+          <span class="opt-key">A</span> StatelessWidget com uma lista final const — simples e eficiente.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz6', 1, true)">
+          <span class="opt-key">B</span> StatefulWidget com uma List&lt;bool&gt; para o estado de cada tarefa, usando setState ao marcar/desmarcar.
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz6', 2, false)">
+          <span class="opt-key">C</span> StatelessWidget chamando setState dentro do build().
+        </button>
+        <button class="quiz-opt" onclick="checkQuiz('quiz6', 3, false)">
+          <span class="opt-key">D</span> StatefulWidget sem setState — só atualizar a List diretamente.
+        </button>
+      </div>
+      <div class="ex-feedback" id="quiz6-fb"></div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +50 XP ao acertar</div>
+      <button class="btn-reset" onclick="resetQuiz('quiz6', 'ex11')">↺ Refazer</button>
+    </div>
+  </div>
+
+  <!-- EXERCÍCIO FINAL — DartPad livre -->
+  <div class="exercise fade-in" id="ex12">
+    <div class="exercise-header">
+      <div class="exercise-badge">
+        <div class="ex-icon">🎓</div>
+        <div>
+          <div class="ex-title">Projeto Livre: Crie Seu App</div>
+          <div class="ex-subtitle">EXERCÍCIO 6.2 · Desafio Criativo Final</div>
+        </div>
+      </div>
+      <div class="ex-difficulty">
+        <span class="diff-dot on"></span>
+        <span class="diff-dot mid"></span>
+        <span class="diff-dot hard"></span>
+        <span style="font-size:11px;color:var(--gray);margin-left:6px;font-family:var(--font-mono)">Boss</span>
+      </div>
+    </div>
+    <div class="exercise-body">
+      <div class="ex-instruction">
+        <strong>Desafio final:</strong> Crie <strong>do zero</strong> um mini app à sua escolha. Sugestões:<br>
+        🎲 Gerador de número aleatório de 1–100<br>
+        🌡️ Conversor de temperatura (Celsius ↔ Fahrenheit)<br>
+        📝 Lista de tarefas simples com checkbox<br><br>
+        Use tudo que aprendeu: Scaffold, Column, Text, Button, setState!
+      </div>
+      <div class="dartpad-wrapper">
+        <iframe src="https://dartpad.dev/embed-flutter.html?split=60&theme=dark&run=true&null_safety=true&code=import%20%27package%3Aflutter%2Fmaterial.dart%27%3B%0A%0Avoid%20main%28%29%20%3D%3E%20runApp%28const%20MyApp%28%29%29%3B%0A%0Aclass%20MyApp%20extends%20StatelessWidget%20%7B%0A%20%20const%20MyApp%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20MaterialApp%28%0A%20%20%20%20%20%20theme%3A%20ThemeData.dark%28%29%2C%0A%20%20%20%20%20%20home%3A%20const%20MeuApp%28%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D%0A%0A%2F%2F%20TODO%3A%20Crie%20seu%20widget%20aqui!%0Aclass%20MeuApp%20extends%20StatefulWidget%20%7B%0A%20%20const%20MeuApp%28%7Bsuper.key%7D%29%3B%0A%20%20%40override%0A%20%20State%3CMeuApp%3E%20createState%28%29%20%3D%3E%20_MeuAppState%28%29%3B%0A%7D%0A%0Aclass%20_MeuAppState%20extends%20State%3CMeuApp%3E%20%7B%0A%20%20%2F%2F%20Adicione%20seu%20estado%20aqui%0A%20%20%0A%20%20%40override%0A%20%20Widget%20build%28BuildContext%20context%29%20%7B%0A%20%20%20%20return%20Scaffold%28%0A%20%20%20%20%20%20appBar%3A%20AppBar%28title%3A%20const%20Text%28%27Meu%20App%27%29%29%2C%0A%20%20%20%20%20%20body%3A%20const%20Center%28%0A%20%20%20%20%20%20%20%20child%3A%20Text%28%27Construa%20seu%20app%20aqui!%27%2C%0A%20%20%20%20%20%20%20%20%20%20style%3A%20TextStyle%28fontSize%3A%2024%29%29%2C%0A%20%20%20%20%20%20%29%2C%0A%20%20%20%20%29%3B%0A%20%20%7D%0A%7D" title="DartPad - Projeto Livre" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="exercise-footer">
+      <div class="xp-badge">⚡ +100 XP — Bônus por terminar o e-book! 🏆</div>
+      <button class="btn-check" onclick="markDartpadDone('ex12', 100)">🎉 Completei meu app!</button>
+    </div>
+  </div>
+
+  <div class="info-box dart fade-in" style="margin-top:40px">
+    <span class="icon">🎯</span>
+    <div class="text">
+      <strong>Continue construindo!</strong> A melhor forma de aprender Flutter é criando projetos reais. Comece pequeno, quebre tudo, conserte, aprenda. Cada bug resolvido é um passo a mais na sua jornada como desenvolvedor Flutter. 🚀
+    </div>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+let totalXP = 0, correctCount = 0, streak = 0;
+const MAX_XP = 700;
+
+// ── Score UI ───────────────────────────────────────────────────
+function updateScore(xp) {
+  totalXP += xp;
+  correctCount++;
+  streak++;
+  document.getElementById('score-xp').textContent = totalXP;
+  document.getElementById('score-correct').textContent = correctCount;
+  document.getElementById('score-streak').textContent = streak;
+  // Update progress
+  const pct = Math.min(100, Math.round((totalXP / MAX_XP) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  showXPToast(xp);
+}
+
+function showXPToast(xp) {
+  const toast = document.getElementById('xp-toast');
+  const msg   = document.getElementById('xp-msg');
+  msg.textContent = '+' + xp + ' XP' + (streak >= 3 ? ' 🔥 Sequência x' + streak : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function missedAnswer() {
+  streak = 0;
+  document.getElementById('score-streak').textContent = streak;
+}
+
+// ── Quiz ────────────────────────────────────────────────────────
+function checkQuiz(id, idx, correct) {
+  const opts = document.querySelectorAll('#' + id + '-opts .quiz-opt');
+  opts.forEach(o => { o.classList.add('disabled'); });
+  const fbEl = document.getElementById(id + '-fb');
+
+  if (correct) {
+    opts[idx].classList.add('correct');
+    fbEl.className = 'ex-feedback success show';
+    fbEl.innerHTML = '<span class="fb-icon">✅</span><span>Correto! Excelente raciocínio.</span>';
+    updateScore(30);
+  } else {
+    opts[idx].classList.add('wrong');
+    // find correct
+    fbEl.className = 'ex-feedback error show';
+    fbEl.innerHTML = '<span class="fb-icon">❌</span><span>Não é essa. Revise o conteúdo acima e tente de novo!</span>';
+    missedAnswer();
+  }
+}
+
+function resetQuiz(id, exId) {
+  const opts = document.querySelectorAll('#' + id + '-opts .quiz-opt');
+  opts.forEach(o => { o.className = 'quiz-opt'; });
+  const fbEl = document.getElementById(id + '-fb');
+  fbEl.className = 'ex-feedback';
+  fbEl.innerHTML = '';
+}
+
+// ── Fill in the blank 1 ─────────────────────────────────────────
+function checkFill1() {
+  const answers = [
+    { id: 'f1_1', correct: 'String' },
+    { id: 'f1_2', correct: 'var' },
+    { id: 'f1_3', correct: 'const' },
+    { id: 'f1_4', correct: '?' },
+  ];
+  let allCorrect = true;
+  answers.forEach(a => {
+    const el = document.getElementById(a.id);
+    const val = el.value.trim();
+    if (val.toLowerCase() === a.correct.toLowerCase()) {
+      el.classList.remove('wrong'); el.classList.add('correct');
+    } else {
+      el.classList.remove('correct'); el.classList.add('wrong');
+      allCorrect = false;
+    }
+  });
+  const fb = document.getElementById('fill1-fb');
+  if (allCorrect) {
+    fb.className = 'ex-feedback success show';
+    fb.innerHTML = '<span class="fb-icon">✅</span><span>Perfeito! Você dominou var, String, const e Null Safety.</span>';
+    updateScore(50);
+  } else {
+    fb.className = 'ex-feedback hint show';
+    fb.innerHTML = '<span class="fb-icon">💡</span><span>Algumas respostas incorretas. Dica: releia a tabela de variáveis acima.</span>';
+    missedAnswer();
+  }
+}
+
+function resetFill(id) {
+  const inputs = document.querySelectorAll('#' + id + ' .blank-input');
+  inputs.forEach(i => { i.value = ''; i.className = 'blank-input'; });
+  const fb = document.getElementById(id + '-fb');
+  fb.className = 'ex-feedback';
+}
+
+// ── Fill in the blank 2 ─────────────────────────────────────────
+function checkFill2() {
+  const answers = [
+    { id: 'f2_1', correct: 'StatefulWidget' },
+    { id: 'f2_2', correct: 'int' },
+    { id: 'f2_3', correct: 'setState' },
+  ];
+  let allCorrect = true;
+  answers.forEach(a => {
+    const el = document.getElementById(a.id);
+    const val = el.value.trim();
+    if (val === a.correct) {
+      el.classList.remove('wrong'); el.classList.add('correct');
+    } else {
+      el.classList.remove('correct'); el.classList.add('wrong');
+      allCorrect = false;
+    }
+  });
+  const fb = document.getElementById('fill2-fb');
+  if (allCorrect) {
+    fb.className = 'ex-feedback success show';
+    fb.innerHTML = '<span class="fb-icon">✅</span><span>Correto! StatefulWidget + int + setState é a combinação certa.</span>';
+    updateScore(50);
+  } else {
+    fb.className = 'ex-feedback hint show';
+    fb.innerHTML = '<span class="fb-icon">💡</span><span>Revise o código de StatefulWidget acima. Atenção ao tipo da variável _count!</span>';
+    missedAnswer();
+  }
+}
+
+// ── Drag & Drop Order ───────────────────────────────────────────
+let dragSrc = null;
+
+function dragStart(e) {
+  dragSrc = e.currentTarget;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => dragSrc.classList.add('dragging'), 0);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.order-item').forEach(i => i.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dragDrop(e, listId) {
+  e.preventDefault();
+  const target = e.currentTarget;
+  if (dragSrc && dragSrc !== target) {
+    const list = document.getElementById(listId);
+    const items = [...list.children];
+    const srcIdx = items.indexOf(dragSrc);
+    const tgtIdx = items.indexOf(target);
+    if (srcIdx < tgtIdx) {
+      list.insertBefore(dragSrc, target.nextSibling);
+    } else {
+      list.insertBefore(dragSrc, target);
+    }
+  }
+  document.querySelectorAll('.order-item').forEach(i => {
+    i.classList.remove('dragging', 'drag-over');
+  });
+}
+
+function checkOrder(listId, fbId, expected) {
+  const list = document.getElementById(listId);
+  const vals = [...list.children].map(i => parseInt(i.dataset.val));
+  const correct = JSON.stringify(vals) === JSON.stringify(expected);
+  const fb = document.getElementById(fbId);
+  if (correct) {
+    fb.className = 'ex-feedback success show';
+    fb.innerHTML = '<span class="fb-icon">✅</span><span>Ordem perfeita! MaterialApp → Scaffold → Center → Text</span>';
+    [...list.children].forEach(i => { i.style.borderColor = 'var(--green)'; });
+    updateScore(50);
+  } else {
+    fb.className = 'ex-feedback error show';
+    fb.innerHTML = '<span class="fb-icon">❌</span><span>Ordem incorreta. Lembre-se: a árvore começa no nó raiz (MaterialApp) e vai até as folhas.</span>';
+    missedAnswer();
+  }
+}
+
+function resetOrder(listId) {
+  const list = document.getElementById(listId);
+  const items = [...list.children];
+  // Shuffle
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    list.insertBefore(items[j], items[i]);
+  }
+  items.forEach(i => { i.style.borderColor = ''; });
+  const fb = document.getElementById(listId.replace('order','order') + '-fb');
+  if (fb) { fb.className = 'ex-feedback'; }
+}
+
+// ── DartPad done ────────────────────────────────────────────────
+const dartpadDone = {};
+function markDartpadDone(exId, xp) {
+  if (dartpadDone[exId]) return;
+  dartpadDone[exId] = true;
+  updateScore(xp);
+  const btn = document.querySelector('#' + exId + ' .btn-check');
+  if (btn) {
+    btn.textContent = '🏆 Concluído!';
+    btn.disabled = true;
+    btn.style.background = 'linear-gradient(135deg, #1A5C1A, #0D8C0D)';
+  }
+}
+
+// ── Copy code ───────────────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copiado ✓';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'copiar'; btn.style.borderColor=''; btn.style.color=''; }, 2000);
+  });
+}
+
+// ── Sidebar ─────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function setActive(el) {
+  document.querySelectorAll('.nav-chapter').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ── Scroll spy ──────────────────────────────────────────────────
+const sections = ['cover','cap1','cap2','cap3','cap4','cap5','cap6'];
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      document.querySelectorAll('.nav-chapter').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+// ── Fade in on scroll ────────────────────────────────────────────
+const fadeObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => fadeObs.observe(el));
+
+// ── Widget tree animation on scroll ──────────────────────────────
+const treeObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.tree-node').forEach(n => {
+        n.style.opacity = '';
+      });
+    }
+  });
+}, { threshold: 0.2 });
+const tree = document.getElementById('widget-tree-demo');
+if (tree) treeObs.observe(tree);
+</script>
+</body>
+</html>
+HTMLEOF
